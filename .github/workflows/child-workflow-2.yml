@@ -1,0 +1,56 @@
+name: Child Workflow 2 - Build & Security
+
+on:
+  workflow_call:
+    secrets:
+      inherit
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Build application
+        run: |
+          echo "Building application..."
+          sleep 4
+          echo "Build completed successfully"
+          mkdir -p build
+          echo "Built application v1.0.0" > build/version.txt
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts-child2
+          path: build/
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run security scan
+        run: |
+          echo "Running security vulnerability scan..."
+          sleep 3
+          echo "Security scan completed - no vulnerabilities found"
+
+      - name: Generate security report
+        run: |
+          echo "Generating security report..."
+          mkdir -p security-results
+          echo "Security Status: PASS - No vulnerabilities detected" > security-results/security-report.txt
+
+      - name: Upload security results
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-results-child2
+          path: security-results/

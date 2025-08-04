@@ -1,0 +1,42 @@
+name: Child Workflow 1 - Tests
+
+on:
+  workflow_call:
+    secrets:
+      inherit
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          echo "Installing dependencies..."
+          sleep 2
+          echo "Dependencies installed successfully"
+
+      - name: Run unit tests
+        run: |
+          echo "Running unit tests..."
+          sleep 3
+          echo "All tests passed!"
+
+      - name: Generate test report
+        run: |
+          echo "Generating test report..."
+          mkdir -p test-results
+          echo "Test Summary: 25 tests passed, 0 failed" > test-results/summary.txt
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-child1
+          path: test-results/

@@ -1,0 +1,33 @@
+# Example configuration for the workflow project
+
+# Project Settings
+project_name: "workflow-order-example"
+version: "1.0.0"
+
+# Workflow Configuration
+workflows:
+  child_workflows:
+    - name: "child-workflow-1"
+      purpose: "Tests"
+      jobs: ["run-tests"]
+      artifacts: ["test-results-child1"]
+    
+    - name: "child-workflow-2" 
+      purpose: "Build & Security"
+      jobs: ["build", "security-scan"]
+      artifacts: ["build-artifacts-child2", "security-results-child2"]
+
+  parent_workflow:
+    name: "parent-workflow"
+    purpose: "Comprehensive CI/CD"
+    depends_on: ["child-workflow-1", "child-workflow-2"]
+    jobs: ["collect-and-deploy"]
+
+# Branch Configuration
+trigger_branches:
+  - main
+  - develop
+
+# Environment Settings
+node_version: "18"
+runner: "ubuntu-latest"

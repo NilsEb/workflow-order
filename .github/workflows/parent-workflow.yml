@@ -1,0 +1,98 @@
+name: Parent Workflow - Comprehensive CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+  pages: write
+  pull-requests: write
+  id-token: write
+
+jobs:
+  # Run child workflows in parallel
+  run-tests:
+    name: "Execute Test Suite"
+    uses: ./.github/workflows/child-workflow-1.yml
+    secrets: inherit
+
+  run-build-security:
+    name: "Execute Build & Security Checks"
+    uses: ./.github/workflows/child-workflow-2.yml
+    secrets: inherit
+
+  # Parent workflow job that runs after both children complete
+  collect-and-deploy:
+    name: "Collect Results & Deploy"
+    needs: [run-tests, run-build-security]
+    runs-on: ubuntu-latest
+    if: always() # Run even if some child workflows fail
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check child workflow results
+        run: |
+          echo "=== Child Workflow Results ==="
+          echo "Tests workflow: ${{ needs.run-tests.result }}"
+          echo "Build & Security workflow: ${{ needs.run-build-security.result }}"
+          echo "================================"
+          
+          # Fail if any required child workflow failed
+          if [[ "${{ needs.run-tests.result }}" != "success" ]] || \
+             [[ "${{ needs.run-build-security.result }}" != "success" ]]; then
+            echo "❌ One or more child workflows failed"
+            exit 1
+          fi
+          
+          echo "✅ All child workflows completed successfully!"
+
+      - name: Download all artifacts from child workflows
+        uses: actions/download-artifact@v4
+        with:
+          path: combined-artifacts/
+
+      - name: Process and combine results
+        run: |
+          echo "Processing combined results from child workflows..."
+          ls -la combined-artifacts/
+          
+          echo "=== Test Results ==="
+          if [ -f "combined-artifacts/test-results-child1/summary.txt" ]; then
+            cat combined-artifacts/test-results-child1/summary.txt
+          fi
+          
+          echo "=== Build Artifacts ==="
+          if [ -f "combined-artifacts/build-artifacts-child2/version.txt" ]; then
+            cat combined-artifacts/build-artifacts-child2/version.txt
+          fi
+          
+          echo "=== Security Results ==="
+          if [ -f "combined-artifacts/security-results-child2/security-report.txt" ]; then
+            cat combined-artifacts/security-results-child2/security-report.txt
+          fi
+
+      - name: Create deployment package
+        run: |
+          echo "Creating deployment package..."
+          mkdir -p deployment
+          echo "Deployment ready - $(date)" > deployment/deployment-info.txt
+          
+          # Copy relevant artifacts to deployment folder
+          if [ -d "combined-artifacts/build-artifacts-child2" ]; then
+            cp -r combined-artifacts/build-artifacts-child2/* deployment/
+          fi
+
+      - name: Upload final deployment artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-package
+          path: deployment/
+
+      - name: Deployment simulation
+        run: |
+          echo "🚀 Simulating deployment..."
+          sleep 2
+          echo "✅ Deployment completed successfully!"
+          echo "🎉 Parent workflow execution finished!"
