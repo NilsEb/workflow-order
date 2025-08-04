@@ -16,13 +16,13 @@ jobs:
     name: "Execute Test Suite"
     uses: ./.github/workflows/child-workflow-1.yml
     with:
-      artifact_id: "child1"
+      artifact_id: "child1-${{ github.ref_name }}-${{ github.sha }}"
 
   run-build-security:
     name: "Execute Build & Security Checks"
     uses: ./.github/workflows/child-workflow-2.yml
     with:
-      artifact_id: "child2"
+      artifact_id: "child2-${{ github.ref_name }}-${{ github.sha }}"
 
   # Parent workflow job that runs after both children complete
   collect-and-deploy:
@@ -50,30 +50,24 @@ jobs:
           
           echo "✅ All child workflows completed successfully!"
 
-      - name: Download all artifacts from child workflows
-        uses: actions/download-artifact@v4
-        with:
-          path: combined-artifacts/
 
-      - name: Process and combine results
-        run: |
-          echo "Processing combined results from child workflows..."
-          ls -la combined-artifacts/
-          
-          echo "=== Test Results ==="
-          if [ -f "combined-artifacts/test-results-child1/summary.txt" ]; then
-            cat combined-artifacts/test-results-child1/summary.txt
-          fi
-          
-          echo "=== Build Artifacts ==="
-          if [ -f "combined-artifacts/build-artifacts-child2/version.txt" ]; then
-            cat combined-artifacts/build-artifacts-child2/version.txt
-          fi
-          
-          echo "=== Security Results ==="
-          if [ -f "combined-artifacts/security-results-child2/security-report.txt" ]; then
-            cat combined-artifacts/security-results-child2/security-report.txt
-          fi
+      - name: Download test artifacts from child workflow 1
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: "test-results-child1-${{ github.ref_name }}-${{ github.sha }}"
+          path: artifacts/
+
+      - name: Download build and security artifacts from child workflow 2
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: "build-artifacts-child2-${{ github.ref_name }}-${{ github.sha }}"
+          path: artifacts/
+
+      - name: Download security artifacts from child workflow 2
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: "security-results-child2-${{ github.ref_name }}-${{ github.sha }}"
+          path: artifacts/
 
       - name: Create deployment package
         run: |
@@ -81,15 +75,15 @@ jobs:
           mkdir -p deployment
           echo "Deployment ready - $(date)" > deployment/deployment-info.txt
           
-          # Copy relevant artifacts to deployment folder
-          if [ -d "combined-artifacts/build-artifacts-child2" ]; then
-            cp -r combined-artifacts/build-artifacts-child2/* deployment/
+          # Copy all artifacts to deployment folder
+          if [ -d "artifacts" ]; then
+            cp -r artifacts/* deployment/
           fi
 
       - name: Upload final deployment artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: deployment-package
+          name: "deployment-package-${{ github.ref_name }}-${{ github.sha }}"
           path: deployment/
 
       - name: Deployment simulation

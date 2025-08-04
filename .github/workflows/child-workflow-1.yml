@@ -36,10 +36,10 @@ jobs:
         run: |
           echo "Generating test report..."
           mkdir -p test-results
-          echo "Test Summary: 25 tests passed, 0 failed" > test-results/summary.txt
+          echo ${{ inputs.artifact_id }} > child1.txt
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
         with:
-          name: test-results-${{ inputs.artifact_id }}
+          name: ${{ inputs.artifact_id }}
           path: test-results/
