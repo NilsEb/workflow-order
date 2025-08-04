@@ -54,19 +54,13 @@ jobs:
       - name: Download test artifacts from child workflow 1
         uses: actions/download-artifact@v4.1.8
         with:
-          name: "test-results-child1-${{ github.ref_name }}-${{ github.sha }}"
+          name: "child1-${{ github.ref_name }}-${{ github.sha }}"
           path: artifacts/
 
       - name: Download build and security artifacts from child workflow 2
         uses: actions/download-artifact@v4.1.8
         with:
-          name: "build-artifacts-child2-${{ github.ref_name }}-${{ github.sha }}"
-          path: artifacts/
-
-      - name: Download security artifacts from child workflow 2
-        uses: actions/download-artifact@v4.1.8
-        with:
-          name: "security-results-child2-${{ github.ref_name }}-${{ github.sha }}"
+          name: "child2-${{ github.ref_name }}-${{ github.sha }}"
           path: artifacts/
 
       - name: Create deployment package
