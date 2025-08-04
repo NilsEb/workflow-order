@@ -36,7 +36,7 @@ jobs:
         run: |
           echo "Generating test report..."
           mkdir -p child1
-          echo ${{ inputs.artifact_id }} > child1.txt
+          echo ${{ inputs.artifact_id }} > child1/child1.txt
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
