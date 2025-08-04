@@ -2,8 +2,7 @@ name: Child Workflow 1 - Tests
 
 on:
   workflow_call:
-    secrets:
-      inherit
+    secrets: inherit
 
 jobs:
   run-tests:
