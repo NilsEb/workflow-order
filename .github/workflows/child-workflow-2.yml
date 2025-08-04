@@ -2,6 +2,11 @@ name: Child Workflow 2 - Build & Security
 
 on:
   workflow_call:
+    inputs:
+      artifact_id:
+        description: 'Unique identifier for artifacts'
+        required: true
+        type: string
 
 
 jobs:
@@ -27,7 +32,7 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts-child2
+          name: build-artifacts-${{ inputs.artifact_id }}
           path: build/
 
   security-scan:
@@ -51,5 +56,5 @@ jobs:
       - name: Upload security results
         uses: actions/upload-artifact@v4
         with:
-          name: security-results-child2
+          name: security-results-${{ inputs.artifact_id }}
           path: security-results/

@@ -15,10 +15,14 @@ jobs:
   run-tests:
     name: "Execute Test Suite"
     uses: ./.github/workflows/child-workflow-1.yml
+    with:
+      artifact_id: "child1"
 
   run-build-security:
     name: "Execute Build & Security Checks"
     uses: ./.github/workflows/child-workflow-2.yml
+    with:
+      artifact_id: "child2"
 
   # Parent workflow job that runs after both children complete
   collect-and-deploy:
