@@ -15,12 +15,10 @@ jobs:
   run-tests:
     name: "Execute Test Suite"
     uses: ./.github/workflows/child-workflow-1.yml
-    secrets: inherit
 
   run-build-security:
     name: "Execute Build & Security Checks"
     uses: ./.github/workflows/child-workflow-2.yml
-    secrets: inherit
 
   # Parent workflow job that runs after both children complete
   collect-and-deploy:

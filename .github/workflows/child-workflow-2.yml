@@ -2,7 +2,7 @@ name: Child Workflow 2 - Build & Security
 
 on:
   workflow_call:
-    secrets: inherit
+
 
 jobs:
   build:
