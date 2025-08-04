@@ -35,11 +35,11 @@ jobs:
       - name: Generate test report
         run: |
           echo "Generating test report..."
-          mkdir -p test-results
+          mkdir -p child1
           echo ${{ inputs.artifact_id }} > child1.txt
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.artifact_id }}
-          path: test-results/
+          path: child1/

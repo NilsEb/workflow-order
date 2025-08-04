@@ -26,11 +26,11 @@ jobs:
           echo "Building application..."
           sleep 4
           echo "Build completed successfully"
-          mkdir -p build
+          mkdir -p child2
           echo ${{ inputs.artifact_id }} > child2.txt
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.artifact_id }}
-          path: build/
+          path: child2/
